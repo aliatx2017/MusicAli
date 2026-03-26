@@ -1,5 +1,6 @@
 package com.musicali.app.di
 
+import com.musicali.app.auth.AuthInterceptor
 import com.musicali.app.data.local.AppDatabase
 import com.musicali.app.data.remote.ScrapingRepository
 import com.musicali.app.data.remote.ScrapingRepositoryImpl
@@ -16,9 +17,10 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(authInterceptor)
         .build()
 
     @Provides

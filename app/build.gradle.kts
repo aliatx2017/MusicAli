@@ -96,6 +96,11 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.2.1")
 
+    // HTTP client
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // HTML parser
+    implementation("org.jsoup:jsoup:1.21.1")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.59.2")
     ksp("com.google.dagger:hilt-android-compiler:2.59.2")

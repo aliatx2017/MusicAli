@@ -1,14 +1,21 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // org.jetbrains.kotlin.android is blocked by AGP 9.0+ (built-in Kotlin support)
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
     namespace = "com.musicali.app"
     compileSdk = 36
+
+    val localProps = Properties()
+    val localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
 
     defaultConfig {
         applicationId = "com.musicali.app"
@@ -18,6 +25,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "YOUTUBE_API_KEY",
+            "\"${localProps.getProperty("YOUTUBE_API_KEY", "")}\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID",
+            "\"${localProps.getProperty("GOOGLE_CLIENT_ID", "")}\"")
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.musicali.app"
     }
 
     buildTypes {
@@ -47,6 +60,10 @@ android {
         getByName("test") {
             java.srcDirs("src/test/java")
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -101,6 +118,24 @@ dependencies {
     // HTML parser
     implementation("org.jsoup:jsoup:1.21.1")
 
+    // Auth — AppAuth PKCE + EncryptedSharedPreferences
+    implementation("net.openid:appauth:0.11.1")
+    implementation("androidx.security:security-crypto:1.1.0")
+
+    // Credential Manager (Google account picker)
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.0.0")
+
+    // Retrofit 3 BOM + converter (YouTube API client)
+    val retrofitBom = platform("com.squareup.retrofit2:retrofit-bom:3.0.0")
+    implementation(retrofitBom)
+    implementation("com.squareup.retrofit2:retrofit")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization")
+
+    // kotlinx.serialization JSON (for Retrofit converter + YouTube response models)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.59.2")
     ksp("com.google.dagger:hilt-android-compiler:2.59.2")
@@ -108,6 +143,7 @@ dependencies {
 
     // Testing
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     testImplementation("androidx.room:room-testing:$roomVersion")
     testImplementation("androidx.test:core:1.6.1")

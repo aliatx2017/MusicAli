@@ -47,7 +47,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Room schema migration v1->v2, GenreCacheEntity/Dao, OkHttp/Jsoup deps, ScrapingRepository interface, Genre enum, NetworkModule
 - [ ] 02-02-PLAN.md — ScrapingRepositoryImpl with OkHttp+Jsoup parsing, HTML fixture tests
-- [ ] 02-03-PLAN.md — ArtistSelectionUseCase with weighted proportional sampling, dedup, and Hilt DI wiring
+- [x] 02-03-PLAN.md — ArtistSelectionUseCase with weighted proportional sampling, dedup, and Hilt DI wiring
 **UI hint**: no
 
 ### Phase 3: Auth and YouTube Integration

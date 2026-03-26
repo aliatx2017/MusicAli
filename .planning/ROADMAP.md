@@ -43,9 +43,9 @@ Plans:
   2. When an EveryNoise page is unreachable, the app falls back to the last successfully cached scrape and continues without crashing
   3. App selects exactly 65 unique artists weighted proportionally by genre list size — larger genre lists contribute more artists, not an equal three-way split
   4. Artists already in the history database are excluded from selection before the final 65 are drawn
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
-- [ ] 02-01-PLAN.md — Room schema migration v1->v2, GenreCacheEntity/Dao, OkHttp/Jsoup deps, ScrapingRepository interface, Genre enum, NetworkModule
+- [x] 02-01-PLAN.md — Room schema migration v1->v2, GenreCacheEntity/Dao, OkHttp/Jsoup deps, ScrapingRepository interface, Genre enum, NetworkModule
 - [ ] 02-02-PLAN.md — ScrapingRepositoryImpl with OkHttp+Jsoup parsing, HTML fixture tests
 - [ ] 02-03-PLAN.md — ArtistSelectionUseCase with weighted proportional sampling, dedup, and Hilt DI wiring
 **UI hint**: no
@@ -92,7 +92,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
-| 2. Scraping and Selection | 0/3 | Planned | - |
+| 2. Scraping and Selection | 1/3 | In Progress|  |
 | 3. Auth and YouTube Integration | 0/? | Not started | - |
 | 4. Orchestration and Progress UI | 0/? | Not started | - |
 | 5. Resilience and Quota Management | 0/? | Not started | - |

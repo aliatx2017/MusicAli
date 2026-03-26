@@ -63,7 +63,7 @@ Plans:
 **Plans:** 1/4 plans executed
 Plans:
 - [x] 03-01-PLAN.md — GCP developer setup (checkpoint) + build.gradle.kts Phase 3 dependencies + BuildConfig fields
-- [ ] 03-02-PLAN.md — TokenStore + AuthRepository interface/impl + AuthInterceptor + AuthModule + SignInScreen + MainActivity eager gate
+- [x] 03-02-PLAN.md — TokenStore + AuthRepository interface/impl + AuthInterceptor + AuthModule + SignInScreen + MainActivity eager gate
 - [ ] 03-03-PLAN.md — YouTube API @Serializable models + Retrofit interface + YouTubeRepository interface/impl + YouTubeModule + FakeYouTubeRepository + unit tests
 - [ ] 03-04-PLAN.md — FakeAuthRepository + AuthInterceptorTest (MockWebServer) + TokenStoreTest (injectable clock)
 **UI hint**: yes

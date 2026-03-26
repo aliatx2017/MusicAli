@@ -12,13 +12,17 @@ One tap generates a fresh 150-song discovery playlist seeded from curated genre 
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Scrape artist names from the three EveryNoise genre pages on demand — *Validated in Phase 02: scraping-and-selection*
+- [x] Select artists weighted proportionally by genre list size with seen-artist exclusion — *Validated in Phase 02: scraping-and-selection (65 artists per run, within 10,000-unit free quota)*
+- [x] Track artist history to avoid repeating artists across playlist generations — *Validated in Phase 01: foundation (Room ArtistEntity + TTL logic)*
 
 ### Active
 
-- [ ] Scrape artist names from the three EveryNoise genre pages on demand
-- [ ] Select 150 unique artists weighted proportionally by genre list size
-- [ ] Track artist history to avoid repeating artists across playlist generations
+- [ ] Search YouTube Music for the top song for each selected artist
+- [ ] Sign in with the user's Google account via OAuth
+- [ ] Create or replace the "AliMusings" YouTube Music playlist with the found tracks
+- [ ] Show generation progress to the user (not a silent background operation)
+- [ ] On-demand trigger — user taps a button to generate
 - [ ] Search YouTube Music for the top song for each selected artist
 - [ ] Sign in with the user's Google account via OAuth
 - [ ] Create or replace the "AliMusings" YouTube Music playlist with the 150 found tracks
@@ -76,4 +80,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after initialization*
+*Last updated: 2026-03-26 — Phase 02 (scraping-and-selection) complete: EveryNoise scraping, weighted artist selection (65 artists/run), Room genre cache, all 16 tests passing. Next: Phase 03 — auth and YouTube integration.*

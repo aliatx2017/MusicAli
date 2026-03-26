@@ -3,9 +3,11 @@ package com.musicali.app
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var authRepositoryImpl: AuthRepositoryImpl
 
     private var isSignedIn by mutableStateOf(false)
+    private var authError by mutableStateOf<String?>(null)
     private lateinit var authService: AuthorizationService
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +66,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 } else {
+                    Column {
+                        authError?.let { Text("AUTH ERROR: $it", color = androidx.compose.ui.graphics.Color.Red) }
+                    }
                     SignInScreen(
                         onSignInClick = {
                             val authRequest = authRepositoryImpl.buildAuthRequest()
@@ -70,7 +76,7 @@ class MainActivity : ComponentActivity() {
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             val completedPendingIntent = PendingIntent.getActivity(
                                 this@MainActivity, 0, completedIntent,
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                             )
                             authService.performAuthorizationRequest(authRequest, completedPendingIntent)
                         }
@@ -88,7 +94,19 @@ class MainActivity : ComponentActivity() {
 
     private fun handleAuthIntent(intent: Intent?) {
         intent ?: return
-        val authResponse = AuthorizationResponse.fromIntent(intent) ?: return
+        Log.d("MusicAli", "handleAuthIntent called, intent action=${intent.action}, extras=${intent.extras?.keySet()}")
+        val authException = AuthorizationException.fromIntent(intent)
+        if (authException != null) {
+            authError = "Auth error: ${authException.errorDescription ?: authException.error}"
+            Log.e("MusicAli", "Auth exception: $authException")
+            return
+        }
+        val authResponse = AuthorizationResponse.fromIntent(intent)
+        if (authResponse == null) {
+            Log.d("MusicAli", "No AuthorizationResponse in intent — not an auth callback")
+            return
+        }
+        Log.d("MusicAli", "Got AuthorizationResponse, exchanging code for tokens")
         lifecycleScope.launch {
             try {
                 authRepositoryImpl.exchangeCodeForTokens(
@@ -96,8 +114,10 @@ class MainActivity : ComponentActivity() {
                     authResponse.createTokenExchangeRequest()
                 )
                 isSignedIn = true
+                Log.d("MusicAli", "Token exchange success, isSignedIn=true")
             } catch (e: Exception) {
-                // Token exchange failed — remain on sign-in screen
+                authError = "Token exchange failed: ${e.javaClass.simpleName}: ${e.message}"
+                Log.e("MusicAli", "Token exchange failed", e)
             }
         }
     }

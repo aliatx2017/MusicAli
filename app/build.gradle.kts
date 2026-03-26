@@ -30,7 +30,9 @@ android {
             "\"${localProps.getProperty("YOUTUBE_API_KEY", "")}\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID",
             "\"${localProps.getProperty("GOOGLE_CLIENT_ID", "")}\"")
-        manifestPlaceholders["appAuthRedirectScheme"] = "com.musicali.app"
+        val reverseClientId = "com.googleusercontent.apps." +
+            localProps.getProperty("GOOGLE_CLIENT_ID", "").removeSuffix(".apps.googleusercontent.com")
+        manifestPlaceholders["appAuthRedirectScheme"] = reverseClientId
     }
 
     buildTypes {

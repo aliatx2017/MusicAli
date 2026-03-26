@@ -35,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
             serviceConfig,
             BuildConfig.GOOGLE_CLIENT_ID,
             ResponseTypeValues.CODE,
-            Uri.parse("com.musicali.app:/oauth2redirect")
+            Uri.parse("com.googleusercontent.apps.${BuildConfig.GOOGLE_CLIENT_ID.removeSuffix(".apps.googleusercontent.com")}:/oauth2redirect")
         ).setScope("https://www.googleapis.com/auth/youtube").build()
 
     /**

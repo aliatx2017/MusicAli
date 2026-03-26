@@ -19,6 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 /**
+ * Interface extracted for testability — PlaylistViewModel depends on this, not the concrete class.
+ * Hilt binding is provided by UseCaseModule.
+ */
+interface PlaylistGenerator {
+    fun execute(): Flow<GenerationProgress>
+}
+
+/**
  * Orchestrates the full playlist generation pipeline, emitting progress events via channelFlow.
  *
  * Pipeline stages:
@@ -34,8 +42,8 @@ class GeneratePlaylistUseCase @Inject constructor(
     private val youTubeRepository: YouTubeRepository,
     private val artistHistoryRepository: ArtistHistoryRepository,
     private val tokenStore: TokenStore
-) {
-    fun execute(): Flow<GenerationProgress> = channelFlow {
+) : PlaylistGenerator {
+    override fun execute(): Flow<GenerationProgress> = channelFlow {
         // Stage 1: Scraping (ArtistSelectionUseCase handles scraping internally)
         send(GenerationProgress.StageChanged(Stage.SCRAPING))
 

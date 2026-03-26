@@ -1,5 +1,8 @@
 package com.musicali.app.di
 
+import com.musicali.app.data.local.AppDatabase
+import com.musicali.app.data.remote.ScrapingRepository
+import com.musicali.app.data.remote.ScrapingRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,4 +20,11 @@ object NetworkModule {
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
+
+    @Provides
+    @Singleton
+    fun provideScrapingRepository(
+        client: OkHttpClient,
+        database: AppDatabase
+    ): ScrapingRepository = ScrapingRepositoryImpl(client, database)
 }

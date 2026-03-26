@@ -1,1 +1,14 @@
 .planning/
+
+# Build outputs
+.gradle/
+app/build/
+build/
+
+# IDE
+.idea/
+*.iml
+.claude/worktrees/
+
+# Android Studio / local config
+local.properties

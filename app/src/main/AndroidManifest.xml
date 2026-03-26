@@ -19,14 +19,8 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- AppAuth OAuth redirect handler — required for Custom Tabs flow to return to the app -->
-        <!-- The ${appAuthRedirectScheme} placeholder is set to "com.musicali.app" in build.gradle.kts -->
-        <activity
-            android:name="net.openid.appauth.RedirectUriReceiverActivity"
-            android:exported="true"
-            tools:node="replace">
+            <!-- OAuth redirect delivered directly here — bypasses AuthorizationManagementActivity
+                 which loses state when the process is killed while Chrome Custom Tab is open -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -34,6 +28,11 @@
                 <data android:scheme="${appAuthRedirectScheme}"/>
             </intent-filter>
         </activity>
+
+        <!-- Remove AppAuth's RedirectUriReceiverActivity — MainActivity handles the redirect -->
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            tools:node="remove"/>
     </application>
 
 </manifest>

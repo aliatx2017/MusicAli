@@ -1,7 +1,8 @@
 package com.musicali.app
 
-import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,7 +26,7 @@ import com.musicali.app.feature.playlist.PlaylistViewModel
 import com.musicali.app.ui.auth.SignInScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import javax.inject.Inject
@@ -44,10 +45,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         authService = AuthorizationService(this)
 
-        // Handle redirect result if activity was launched by AppAuth's PendingIntent
-        handleAuthIntent(intent)
+        // Handle redirect if process was killed and restarted via the redirect URI
+        handleRedirectIntent(intent)
 
-        // Check sign-in state on launch (per D-04: eager gate)
         lifecycleScope.launch {
             isSignedIn = authRepository.isSignedIn()
         }
@@ -61,7 +61,6 @@ class MainActivity : ComponentActivity() {
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            // Phase 4 wires the full Generate UI here
                             Text("MusicAli — Ready to generate")
                         }
                     }
@@ -70,43 +69,71 @@ class MainActivity : ComponentActivity() {
                         authError?.let { Text("AUTH ERROR: $it", color = androidx.compose.ui.graphics.Color.Red) }
                     }
                     SignInScreen(
-                        onSignInClick = {
-                            val authRequest = authRepositoryImpl.buildAuthRequest()
-                            val completedIntent = Intent(this@MainActivity, MainActivity::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                            val completedPendingIntent = PendingIntent.getActivity(
-                                this@MainActivity, 0, completedIntent,
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                            )
-                            authService.performAuthorizationRequest(authRequest, completedPendingIntent)
-                        }
+                        onSignInClick = { launchSignIn() }
                     )
                 }
             }
         }
     }
 
-    // Called when singleTop MainActivity is brought to front by AppAuth's PendingIntent
+    // Handles redirect when singleTop MainActivity is brought to front by the redirect URI intent
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleAuthIntent(intent)
+        handleRedirectIntent(intent)
     }
 
-    private fun handleAuthIntent(intent: Intent?) {
-        intent ?: return
-        Log.d("MusicAli", "handleAuthIntent called, intent action=${intent.action}, extras=${intent.extras?.keySet()}")
-        val authException = AuthorizationException.fromIntent(intent)
-        if (authException != null) {
-            authError = "Auth error: ${authException.errorDescription ?: authException.error}"
-            Log.e("MusicAli", "Auth exception: $authException")
+    private fun launchSignIn() {
+        val authRequest = authRepositoryImpl.buildAuthRequest()
+        // Persist the request JSON so we can reconstruct AuthorizationResponse after process death
+        getSharedPreferences("auth_pending", Context.MODE_PRIVATE)
+            .edit()
+            .putString("request_json", authRequest.jsonSerializeString())
+            .apply()
+        Log.d("MusicAli", "Launching auth, saved request JSON")
+        val authIntent = authService.getAuthorizationRequestIntent(authRequest)
+        startActivity(authIntent)
+    }
+
+    /**
+     * Called from both onCreate (process restarted by redirect) and onNewIntent (singleTop).
+     * The intent data is the full redirect URI — parse code directly from it.
+     */
+    private fun handleRedirectIntent(intent: Intent?) {
+        val uri = intent?.data ?: return
+        val scheme = uri.scheme ?: return
+        if (!scheme.startsWith("com.googleusercontent.apps")) return
+
+        Log.d("MusicAli", "Got redirect URI: $uri")
+
+        val error = uri.getQueryParameter("error")
+        if (error != null) {
+            authError = "Auth error: $error"
+            Log.e("MusicAli", "Auth error in redirect: $error")
             return
         }
-        val authResponse = AuthorizationResponse.fromIntent(intent)
-        if (authResponse == null) {
-            Log.d("MusicAli", "No AuthorizationResponse in intent — not an auth callback")
+
+        val code = uri.getQueryParameter("code")
+        if (code == null) {
+            authError = "Auth error: no code in redirect"
+            Log.e("MusicAli", "No code in redirect URI")
             return
         }
-        Log.d("MusicAli", "Got AuthorizationResponse, exchanging code for tokens")
+
+        val requestJson = getSharedPreferences("auth_pending", Context.MODE_PRIVATE)
+            .getString("request_json", null)
+        if (requestJson == null) {
+            authError = "Auth error: no pending request found"
+            Log.e("MusicAli", "No pending request in SharedPreferences")
+            return
+        }
+
+        val savedRequest = AuthorizationRequest.jsonDeserialize(requestJson)
+        val authResponse = AuthorizationResponse.Builder(savedRequest)
+            .setAuthorizationCode(code)
+            .setState(uri.getQueryParameter("state"))
+            .build()
+
+        Log.d("MusicAli", "Parsed redirect, exchanging code for tokens")
         lifecycleScope.launch {
             try {
                 authRepositoryImpl.exchangeCodeForTokens(
@@ -114,7 +141,10 @@ class MainActivity : ComponentActivity() {
                     authResponse.createTokenExchangeRequest()
                 )
                 isSignedIn = true
-                Log.d("MusicAli", "Token exchange success, isSignedIn=true")
+                Log.d("MusicAli", "Token exchange success")
+                // Clear the pending request
+                getSharedPreferences("auth_pending", Context.MODE_PRIVATE)
+                    .edit().remove("request_json").apply()
             } catch (e: Exception) {
                 authError = "Token exchange failed: ${e.javaClass.simpleName}: ${e.message}"
                 Log.e("MusicAli", "Token exchange failed", e)
@@ -124,6 +154,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        authService.dispose()  // per Pitfall 3 — prevent ServiceConnection leak
+        authService.dispose()
     }
 }

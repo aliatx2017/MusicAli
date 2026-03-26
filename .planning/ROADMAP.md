@@ -35,15 +35,19 @@ Plans:
 - [x] 01-02-PLAN.md — Room schema with hybrid TTL, Hilt DI modules, ArtistHistoryRepository, and DAO tests
 
 ### Phase 2: Scraping and Selection
-**Goal**: The app reliably produces a list of 150 unique, eligible artists from EveryNoise genre pages — the core data input for every playlist generation
+**Goal**: The app reliably produces a list of 65 unique, eligible artists from EveryNoise genre pages — the core data input for every playlist generation
 **Depends on**: Phase 1
 **Requirements**: SCRP-01, SCRP-02, SCRP-03, SCRP-04, SEL-01, SEL-02
 **Success Criteria** (what must be TRUE):
   1. App fetches and parses artist names from each of the three EveryNoise pages (Indietronica, Nu Disco, Indie Soul) on demand — parsing validates a minimum artist count and raises a hard error if the page returns fewer than 30 artists
   2. When an EveryNoise page is unreachable, the app falls back to the last successfully cached scrape and continues without crashing
-  3. App selects exactly 150 unique artists weighted proportionally by genre list size — larger genre lists contribute more artists, not an equal three-way split
-  4. Artists already in the history database are excluded from selection before the final 150 are drawn
-**Plans**: TBD
+  3. App selects exactly 65 unique artists weighted proportionally by genre list size — larger genre lists contribute more artists, not an equal three-way split
+  4. Artists already in the history database are excluded from selection before the final 65 are drawn
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Room schema migration v1->v2, GenreCacheEntity/Dao, OkHttp/Jsoup deps, ScrapingRepository interface, Genre enum, NetworkModule
+- [ ] 02-02-PLAN.md — ScrapingRepositoryImpl with OkHttp+Jsoup parsing, HTML fixture tests
+- [ ] 02-03-PLAN.md — ArtistSelectionUseCase with weighted proportional sampling, dedup, and Hilt DI wiring
 **UI hint**: no
 
 ### Phase 3: Auth and YouTube Integration
@@ -65,7 +69,7 @@ Plans:
 **Requirements**: UX-01, UX-02, UX-03
 **Success Criteria** (what must be TRUE):
   1. User sees a single Generate button on the home screen and tapping it starts playlist generation — no other navigation or setup required
-  2. User sees a real-time progress indicator that advances through labeled stages (Scraping genres, Selecting artists, Searching YouTube, Building playlist) — the screen never appears frozen during the 30–90 second operation
+  2. User sees a real-time progress indicator that advances through labeled stages (Scraping genres, Selecting artists, Searching YouTube, Building playlist) — the screen never appears frozen during the 30-90 second operation
   3. When generation completes, user sees a summary showing how many artists were found, how many songs were added, and how many artists were skipped due to no search result
   4. Each failure mode (scrape failure, auth expiry, quota exceeded, no results) displays a specific error message with a recovery action — not a generic crash or silent hang
 **Plans**: TBD
@@ -88,7 +92,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
-| 2. Scraping and Selection | 0/? | Not started | - |
+| 2. Scraping and Selection | 0/3 | Planned | - |
 | 3. Auth and YouTube Integration | 0/? | Not started | - |
 | 4. Orchestration and Progress UI | 0/? | Not started | - |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
@@ -105,7 +109,7 @@ Plans:
 | SCRP-02 | Phase 2 | Nu Disco scraping |
 | SCRP-03 | Phase 2 | Indie Soul scraping |
 | SCRP-04 | Phase 2 | Fallback to cached scrape |
-| SEL-01 | Phase 2 | Weighted proportional selection of 150 artists |
+| SEL-01 | Phase 2 | Weighted proportional selection of 65 artists |
 | SEL-02 | Phase 2 | Exclude history-seen artists from selection |
 | AUTH-01 | Phase 3 | AppAuth PKCE + Credential Manager sign-in |
 | AUTH-02 | Phase 3 | Token persistence + silent refresh |
@@ -119,9 +123,9 @@ Plans:
 | YT-02 | Phase 5 | Video ID cache in Room to avoid repeat quota spend |
 | YT-03 | Phase 5 | Skip artists with no YouTube result, continue run |
 
-**Total mapped: 19/19 ✓**
+**Total mapped: 19/19**
 
 ---
 
 *Created: 2026-03-25*
-*Last updated: 2026-03-25 after Phase 1 planning*
+*Last updated: 2026-03-26 after Phase 2 planning*

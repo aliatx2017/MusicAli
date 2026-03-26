@@ -12,7 +12,7 @@
 - [x] **Phase 1: Foundation** - Build tooling, Room schema with artist history TTL, Hilt DI wiring, and confirmed YouTube quota strategy (completed 2026-03-26)
 - [ ] **Phase 2: Scraping and Selection** - EveryNoise scraping for 3 genres, artist cache fallback, weighted proportional selection, and cross-run deduplication
 - [x] **Phase 3: Auth and YouTube Integration** - Google OAuth PKCE flow, token persistence and proactive refresh, YouTube search and playlist create/replace (completed 2026-03-26)
-- [ ] **Phase 4: Orchestration and Progress UI** - Full pipeline wired end-to-end via GeneratePlaylistUseCase, single-screen Compose UI with real-time progress
+- [x] **Phase 4: Orchestration and Progress UI** - Full pipeline wired end-to-end via GeneratePlaylistUseCase, single-screen Compose UI with real-time progress (completed 2026-03-26)
 - [ ] **Phase 5: Resilience and Quota Management** - Video ID caching to eliminate repeat quota spend, graceful skip for artists with no search result
 
 ---
@@ -77,10 +77,10 @@ Plans:
   2. User sees a real-time progress indicator that advances through labeled stages (Scraping genres, Selecting artists, Searching YouTube, Building playlist) — the screen never appears frozen during the 30-90 second operation
   3. When generation completes, user sees a summary showing how many artists were found, how many songs were added, and how many artists were skipped due to no search result
   4. Each failure mode (scrape failure, auth expiry, quota exceeded, no results) displays a specific error message with a recovery action — not a generic crash or silent hang
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 04-01-PLAN.md — GenerationProgress/PlaylistUiState contracts + GeneratePlaylistUseCase orchestrator with channelFlow + unit tests
-- [ ] 04-02-PLAN.md — PlaylistViewModel state reduction + PlaylistScreen composable + MainActivity wiring + human verification
+- [x] 04-02-PLAN.md — PlaylistViewModel state reduction + PlaylistScreen composable + MainActivity wiring + human verification
 **UI hint**: yes
 
 ### Phase 5: Resilience and Quota Management
@@ -102,7 +102,7 @@ Plans:
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
 | 2. Scraping and Selection | 3/3 | Complete   | 2026-03-26 |
 | 3. Auth and YouTube Integration | 4/4 | Complete   | 2026-03-26 |
-| 4. Orchestration and Progress UI | 1/2 | In Progress|  |
+| 4. Orchestration and Progress UI | 2/2 | Complete   | 2026-03-26 |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
 
 ---

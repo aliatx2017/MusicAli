@@ -43,10 +43,10 @@ Plans:
   2. When an EveryNoise page is unreachable, the app falls back to the last successfully cached scrape and continues without crashing
   3. App selects exactly 65 unique artists weighted proportionally by genre list size — larger genre lists contribute more artists, not an equal three-way split
   4. Artists already in the history database are excluded from selection before the final 65 are drawn
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans executed
 Plans:
 - [x] 02-01-PLAN.md — Room schema migration v1->v2, GenreCacheEntity/Dao, OkHttp/Jsoup deps, ScrapingRepository interface, Genre enum, NetworkModule
-- [ ] 02-02-PLAN.md — ScrapingRepositoryImpl with OkHttp+Jsoup parsing, HTML fixture tests
+- [x] 02-02-PLAN.md — ScrapingRepositoryImpl with OkHttp+Jsoup parsing, HTML fixture tests
 - [x] 02-03-PLAN.md — ArtistSelectionUseCase with weighted proportional sampling, dedup, and Hilt DI wiring
 **UI hint**: no
 
@@ -57,7 +57,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can sign in with their Google account using AppAuth PKCE + Credential Manager — no WebView; Custom Tabs are used for the consent screen
   2. App persists OAuth tokens in EncryptedSharedPreferences and silently refreshes them on the next launch without prompting the user to sign in again
-  3. If the access token expires mid-generation, a proactive OkHttp interceptor refreshes it transparently and the in-flight request retries — generation continues without user intervention
+  3. If the access token expires mid-generation, a proactive OkHttp interceptor refreshes it transparently and the in-flight request ret, — generation continues without user intervention
   4. App can search the YouTube Data API v3 for a top song given an artist name and return a valid video ID
   5. App can delete the existing AliMusings playlist (if it exists) and recreate it using delete + recreate semantics — never item-level deletes — and insert all tracks in a single session
 **Plans:** 4/4 plans complete
@@ -77,7 +77,10 @@ Plans:
   2. User sees a real-time progress indicator that advances through labeled stages (Scraping genres, Selecting artists, Searching YouTube, Building playlist) — the screen never appears frozen during the 30-90 second operation
   3. When generation completes, user sees a summary showing how many artists were found, how many songs were added, and how many artists were skipped due to no search result
   4. Each failure mode (scrape failure, auth expiry, quota exceeded, no results) displays a specific error message with a recovery action — not a generic crash or silent hang
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — GenerationProgress/PlaylistUiState contracts + GeneratePlaylistUseCase orchestrator with channelFlow + unit tests
+- [ ] 04-02-PLAN.md — PlaylistViewModel state reduction + PlaylistScreen composable + MainActivity wiring + human verification
 **UI hint**: yes
 
 ### Phase 5: Resilience and Quota Management
@@ -97,9 +100,9 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
-| 2. Scraping and Selection | 1/3 | In Progress|  |
+| 2. Scraping and Selection | 3/3 | Complete   | 2026-03-26 |
 | 3. Auth and YouTube Integration | 4/4 | Complete   | 2026-03-26 |
-| 4. Orchestration and Progress UI | 0/? | Not started | - |
+| 4. Orchestration and Progress UI | 0/2 | Planned | - |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
 
 ---
@@ -133,4 +136,4 @@ Plans:
 ---
 
 *Created: 2026-03-25*
-*Last updated: 2026-03-26 after Phase 3 planning*
+*Last updated: 2026-03-26 after Phase 4 planning*

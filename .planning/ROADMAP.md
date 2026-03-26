@@ -11,7 +11,7 @@
 
 - [x] **Phase 1: Foundation** - Build tooling, Room schema with artist history TTL, Hilt DI wiring, and confirmed YouTube quota strategy (completed 2026-03-26)
 - [ ] **Phase 2: Scraping and Selection** - EveryNoise scraping for 3 genres, artist cache fallback, weighted proportional selection, and cross-run deduplication
-- [ ] **Phase 3: Auth and YouTube Integration** - Google OAuth PKCE flow, token persistence and proactive refresh, YouTube search and playlist create/replace
+- [x] **Phase 3: Auth and YouTube Integration** - Google OAuth PKCE flow, token persistence and proactive refresh, YouTube search and playlist create/replace (completed 2026-03-26)
 - [ ] **Phase 4: Orchestration and Progress UI** - Full pipeline wired end-to-end via GeneratePlaylistUseCase, single-screen Compose UI with real-time progress
 - [ ] **Phase 5: Resilience and Quota Management** - Video ID caching to eliminate repeat quota spend, graceful skip for artists with no search result
 
@@ -60,12 +60,12 @@ Plans:
   3. If the access token expires mid-generation, a proactive OkHttp interceptor refreshes it transparently and the in-flight request retries — generation continues without user intervention
   4. App can search the YouTube Data API v3 for a top song given an artist name and return a valid video ID
   5. App can delete the existing AliMusings playlist (if it exists) and recreate it using delete + recreate semantics — never item-level deletes — and insert all tracks in a single session
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [x] 03-01-PLAN.md — GCP developer setup (checkpoint) + build.gradle.kts Phase 3 dependencies + BuildConfig fields
 - [x] 03-02-PLAN.md — TokenStore + AuthRepository interface/impl + AuthInterceptor + AuthModule + SignInScreen + MainActivity eager gate
 - [x] 03-03-PLAN.md — YouTube API @Serializable models + Retrofit interface + YouTubeRepository interface/impl + YouTubeModule + FakeYouTubeRepository + unit tests
-- [ ] 03-04-PLAN.md — FakeAuthRepository + AuthInterceptorTest (MockWebServer) + TokenStoreTest (injectable clock)
+- [x] 03-04-PLAN.md — FakeAuthRepository + AuthInterceptorTest (MockWebServer) + TokenStoreTest (injectable clock)
 **UI hint**: yes
 
 ### Phase 4: Orchestration and Progress UI
@@ -98,7 +98,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
 | 2. Scraping and Selection | 1/3 | In Progress|  |
-| 3. Auth and YouTube Integration | 3/4 | In Progress|  |
+| 3. Auth and YouTube Integration | 4/4 | Complete   | 2026-03-26 |
 | 4. Orchestration and Progress UI | 0/? | Not started | - |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
 

@@ -18,16 +18,31 @@ class FakeYouTubeRepository : YouTubeRepository {
     /** Accumulates all playlistIds passed to deletePlaylist(). Assert on this in tests. */
     val deletedPlaylistIds = mutableListOf<String>()
 
-    override suspend fun searchTopSong(artistName: String): String? =
-        searchResults[artistName]
+    /** If set, searchTopSong() throws this exception instead of returning from searchResults. */
+    var searchException: Exception? = null
 
-    override suspend fun createPlaylist(title: String): String = createdPlaylistId
+    /** If set, createPlaylist() throws this exception. */
+    var createPlaylistException: Exception? = null
+
+    /** If set, addTrack() throws this exception. */
+    var addTrackException: Exception? = null
+
+    override suspend fun searchTopSong(artistName: String): String? {
+        searchException?.let { throw it }
+        return searchResults[artistName]
+    }
+
+    override suspend fun createPlaylist(title: String): String {
+        createPlaylistException?.let { throw it }
+        return createdPlaylistId
+    }
 
     override suspend fun deletePlaylist(playlistId: String) {
         deletedPlaylistIds.add(playlistId)
     }
 
     override suspend fun addTrack(playlistId: String, videoId: String) {
+        addTrackException?.let { throw it }
         addedVideoIds.add(videoId)
     }
 }

@@ -35,9 +35,9 @@
 
 ### Generation UX
 
-- [ ] **UX-01**: User sees a real-time progress indicator during generation (scraping → selecting → searching → building playlist)
+- [x] **UX-01**: User sees a real-time progress indicator during generation (scraping → selecting → searching → building playlist)
 - [ ] **UX-02**: User can trigger playlist generation with a single tap
-- [ ] **UX-03**: App displays count of artists found, songs added, and any skipped artists after generation completes
+- [x] **UX-03**: App displays count of artists found, songs added, and any skipped artists after generation completes
 
 ## v2 Requirements
 
@@ -81,9 +81,9 @@
 | YT-01 | Phase 3 | Complete |
 | YT-04 | Phase 3 | Complete |
 | YT-05 | Phase 3 | Complete |
-| UX-01 | Phase 4 | Pending |
+| UX-01 | Phase 4 | Complete |
 | UX-02 | Phase 4 | Pending |
-| UX-03 | Phase 4 | Pending |
+| UX-03 | Phase 4 | Complete |
 | YT-02 | Phase 5 | Pending |
 | YT-03 | Phase 5 | Pending |
 

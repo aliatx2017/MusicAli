@@ -77,9 +77,9 @@ Plans:
   2. User sees a real-time progress indicator that advances through labeled stages (Scraping genres, Selecting artists, Searching YouTube, Building playlist) — the screen never appears frozen during the 30-90 second operation
   3. When generation completes, user sees a summary showing how many artists were found, how many songs were added, and how many artists were skipped due to no search result
   4. Each failure mode (scrape failure, auth expiry, quota exceeded, no results) displays a specific error message with a recovery action — not a generic crash or silent hang
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 04-01-PLAN.md — GenerationProgress/PlaylistUiState contracts + GeneratePlaylistUseCase orchestrator with channelFlow + unit tests
+- [x] 04-01-PLAN.md — GenerationProgress/PlaylistUiState contracts + GeneratePlaylistUseCase orchestrator with channelFlow + unit tests
 - [ ] 04-02-PLAN.md — PlaylistViewModel state reduction + PlaylistScreen composable + MainActivity wiring + human verification
 **UI hint**: yes
 
@@ -102,7 +102,7 @@ Plans:
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
 | 2. Scraping and Selection | 3/3 | Complete   | 2026-03-26 |
 | 3. Auth and YouTube Integration | 4/4 | Complete   | 2026-03-26 |
-| 4. Orchestration and Progress UI | 0/2 | Planned | - |
+| 4. Orchestration and Progress UI | 1/2 | In Progress|  |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
 
 ---

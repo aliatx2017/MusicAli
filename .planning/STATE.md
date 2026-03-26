@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-26T13:32:53.370Z"
+stopped_at: "Completed 03-01-PLAN.md: Phase 3 deps and BuildConfig fields"
+last_updated: "2026-03-26T15:04:41.204Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 10
+  completed_plans: 7
 ---
 
 # Project State: MusicAli
@@ -23,14 +23,14 @@ progress:
 
 **Core value:** One tap generates a fresh 150-song discovery playlist seeded from curated genre lists — no manual curation required.
 
-**Current focus:** Phase 02 — scraping-and-selection
+**Current focus:** Phase 03 — auth-and-youtube-integration
 
 ---
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
+Phase: 03 (auth-and-youtube-integration) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: Not started
 | Phase 02 P01 | 18 | 2 tasks | 10 files |
 | Phase 02 P02 | 2 | 2 tasks | 5 files |
 | Phase 02 P03 | 3 | 2 tasks | 4 files |
+| Phase 03-auth-and-youtube-integration P01 | 20 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -64,7 +65,7 @@ Plan: Not started
 
 - **YouTube quota**: 150 `search.list` calls = 15,000 units/day vs. 10,000 free. Must resolve before writing search loop code: request quota increase AND/OR Room video ID cache. Phase 1 gates this decision.
 - **EveryNoise scraping**: Static HTML, Jsoup sufficient. CSS selectors must be verified against the live page before implementing the parser — training-data selectors may be stale.
-- **KSP patch version**: `2.3.20-x` suffix must be confirmed at github.com/google/ksp/releases before writing build.gradle.kts.
+- **KSP patch version**: RESOLVED in 03-01 — KSP now uses standalone versioning (e.g., `2.3.6`); no longer tied to Kotlin version prefix. Current `2.3.6` is latest and works with Kotlin 2.3.20.
 - **Third-party lib versions**: OkHttp 4.12.x, Retrofit 2.11.x, Jsoup 1.17.x — training data only. Verify at official sources before pinning.
 
 ### Research Flags
@@ -81,6 +82,12 @@ Plan: Not started
 - [ ] Spike AppAuth + Credential Manager integration (before Phase 3 implementation)
 
 ### Confirmed Decisions
+
+### Phase 03 Implementation Decisions
+
+- **KSP standalone versioning**: KSP transitioned from `kotlinVersion-kspPatch` to standalone versioning (e.g., `2.3.6`). The version `2.3.6` is the latest release and already works with Kotlin 2.3.20 — no version change needed.
+- **Gradle Kotlin DSL Properties scope**: `java.util.Properties()` must be declared at the `android {}` level with `import java.util.Properties` at the file top — placing it inside `defaultConfig {}` causes "Unresolved reference 'util'" in Gradle Kotlin DSL.
+- **Retrofit 3 BOM**: Using Retrofit 3 BOM (3.0.0) for dependency management — individual artifact versions omitted when BOM is declared as `platform()`.
 
 ### Phase 01-02 Implementation Decisions
 
@@ -112,8 +119,8 @@ None currently.
 
 ## Session Continuity
 
-**Last session:** 2026-03-26T13:32:53.364Z
-**Stopped at:** Phase 3 context gathered
+**Last session:** 2026-03-26T15:04:41.200Z
+**Stopped at:** Completed 03-01-PLAN.md: Phase 3 deps and BuildConfig fields
 
 **Phase 01-foundation status:** COMPLETE (2/2 plans executed)
 **Next:** Phase 02 execution or phase transition via `/gsd:transition`

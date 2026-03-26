@@ -7,9 +7,9 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can sign in with their Google account via OAuth (AppAuth PKCE + Credential Manager)
-- [ ] **AUTH-02**: App persists OAuth tokens (DataStore) and silently refreshes them without requiring re-login
-- [ ] **AUTH-03**: App recovers gracefully if token expires mid-generation (retry with refreshed token)
+- [x] **AUTH-01**: User can sign in with their Google account via OAuth (AppAuth PKCE + Credential Manager)
+- [x] **AUTH-02**: App persists OAuth tokens (DataStore) and silently refreshes them without requiring re-login
+- [x] **AUTH-03**: App recovers gracefully if token expires mid-generation (retry with refreshed token)
 
 ### Scraping
 
@@ -27,11 +27,11 @@
 
 ### YouTube Integration
 
-- [ ] **YT-01**: App searches YouTube Data API v3 for a top song for each selected artist
+- [x] **YT-01**: App searches YouTube Data API v3 for a top song for each selected artist
 - [ ] **YT-02**: App caches artist → videoId mappings in Room DB to avoid repeat quota spend
 - [ ] **YT-03**: App skips artists where no YouTube result is found and continues generation
-- [ ] **YT-04**: App creates or replaces the "AliMusings" YouTube Music playlist (delete + recreate, not item-level delete)
-- [ ] **YT-05**: App adds all found tracks to the AliMusings playlist in a single session
+- [x] **YT-04**: App creates or replaces the "AliMusings" YouTube Music playlist (delete + recreate, not item-level delete)
+- [x] **YT-05**: App adds all found tracks to the AliMusings playlist in a single session
 
 ### Generation UX
 
@@ -75,12 +75,12 @@
 | SCRP-04 | Phase 2 | Complete |
 | SEL-01 | Phase 2 | Complete |
 | SEL-02 | Phase 2 | Complete |
-| AUTH-01 | Phase 3 | Pending |
-| AUTH-02 | Phase 3 | Pending |
-| AUTH-03 | Phase 3 | Pending |
-| YT-01 | Phase 3 | Pending |
-| YT-04 | Phase 3 | Pending |
-| YT-05 | Phase 3 | Pending |
+| AUTH-01 | Phase 3 | Complete |
+| AUTH-02 | Phase 3 | Complete |
+| AUTH-03 | Phase 3 | Complete |
+| YT-01 | Phase 3 | Complete |
+| YT-04 | Phase 3 | Complete |
+| YT-05 | Phase 3 | Complete |
 | UX-01 | Phase 4 | Pending |
 | UX-02 | Phase 4 | Pending |
 | UX-03 | Phase 4 | Pending |

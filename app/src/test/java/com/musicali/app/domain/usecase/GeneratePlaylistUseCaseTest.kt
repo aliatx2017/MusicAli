@@ -18,6 +18,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
@@ -223,7 +224,8 @@ class GeneratePlaylistUseCaseTest {
 
     /** Helper to create an HttpException with a given HTTP status code. */
     private fun makeHttpException(code: Int): HttpException {
-        val response = Response.error<Any>(code, okhttp3.ResponseBody.create(null, "error"))
+        val body = okhttp3.ResponseBody.create("text/plain".toMediaTypeOrNull(), "error")
+        val response = Response.error<Any>(code, body)
         return HttpException(response)
     }
 }

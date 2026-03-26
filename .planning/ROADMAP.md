@@ -60,7 +60,12 @@ Plans:
   3. If the access token expires mid-generation, a proactive OkHttp interceptor refreshes it transparently and the in-flight request retries — generation continues without user intervention
   4. App can search the YouTube Data API v3 for a top song given an artist name and return a valid video ID
   5. App can delete the existing AliMusings playlist (if it exists) and recreate it using delete + recreate semantics — never item-level deletes — and insert all tracks in a single session
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 03-01-PLAN.md — GCP developer setup (checkpoint) + build.gradle.kts Phase 3 dependencies + BuildConfig fields
+- [ ] 03-02-PLAN.md — TokenStore + AuthRepository interface/impl + AuthInterceptor + AuthModule + SignInScreen + MainActivity eager gate
+- [ ] 03-03-PLAN.md — YouTube API @Serializable models + Retrofit interface + YouTubeRepository interface/impl + YouTubeModule + FakeYouTubeRepository + unit tests
+- [ ] 03-04-PLAN.md — FakeAuthRepository + AuthInterceptorTest (MockWebServer) + TokenStoreTest (injectable clock)
 **UI hint**: yes
 
 ### Phase 4: Orchestration and Progress UI
@@ -93,7 +98,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-26 |
 | 2. Scraping and Selection | 1/3 | In Progress|  |
-| 3. Auth and YouTube Integration | 0/? | Not started | - |
+| 3. Auth and YouTube Integration | 0/4 | Planned | - |
 | 4. Orchestration and Progress UI | 0/? | Not started | - |
 | 5. Resilience and Quota Management | 0/? | Not started | - |
 
@@ -128,4 +133,4 @@ Plans:
 ---
 
 *Created: 2026-03-25*
-*Last updated: 2026-03-26 after Phase 2 planning*
+*Last updated: 2026-03-26 after Phase 3 planning*

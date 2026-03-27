@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-03-27T00:20:02.572Z",
+  "phase": "04",
+  "phase_name": "orchestration-and-progress-ui",
+  "phase_dir": ".planning/phases/04-orchestration-and-progress-ui",
+  "plan": 2,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Extract PlaylistGenerator interface, expand PlaylistViewModel, add PlaylistViewModelTest", "status": "done", "commit": "c621023"},
+    {"id": 2, "name": "Create PlaylistScreen composable and wire into MainActivity", "status": "done", "commit": "9e78d4f"},
+    {"id": 3, "name": "Verify end-to-end playlist generation on device", "status": "in_progress", "progress": "Tested on Pixel 8a - 16. UI states work correctly. AliMusings playlist created (empty) on YouTube Music. Two bugs found: (1) 'No internet connection' misclassification — FIXED (uncommitted), (2) YouTube quota exhausted — external blocker."}
+  ],
+  "remaining_tasks": [
+    {"id": "debug-fix", "name": "Commit debug fixes for no-internet-misclassification", "status": "not_started"},
+    {"id": "checkpoint-approve", "name": "Re-test after quota reset and approve Phase 4 checkpoint", "status": "blocked_on_quota_reset"}
+  ],
+  "blockers": [
+    {
+      "description": "YouTube Data API daily quota exhausted during UAT (two generation runs burned ~9,850+ units each)",
+      "type": "external",
+      "workaround": "Wait for quota reset (midnight Pacific). Check https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas"
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Commit the three debug-fixed files, then after quota resets run ./gradlew :app:installDebug and tap Generate Playlist",
+      "context": "Files modified but uncommitted: AuthRepositoryImpl.kt (Dispatchers.Main fix for AppAuth Looper crash), YouTubeRepositoryImpl.kt (deletePlaylist now propagates 401/403), REQUIREMENTS.md. Debug session: .planning/debug/no-internet-misclassification.md",
+      "blocking": true
+    },
+    {
+      "action": "After successful generation (AliMusings populated with songs), type 'confirmed fixed' to close debug session and Phase 4 checkpoint",
+      "context": "Phase 4 completes after checkpoint approval -> phase verifier runs -> ROADMAP advances to Phase 5",
+      "blocking": true
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Fix AuthRepositoryImpl.refreshAccessToken() with withContext(Dispatchers.Main) for AppAuth performTokenRequest",
+      "rationale": "AppAuth creates an Android Handler internally requiring a Looper. OkHttp interceptor threads have no Looper, causing RuntimeException wrapped as IOException, misclassified as NetworkError ('No internet connection').",
+      "phase": "04"
+    },
+    {
+      "decision": "Fix YouTubeRepositoryImpl.deletePlaylist() to only swallow 404, not all exceptions via runCatching",
+      "rationale": "Original runCatching silently hid 403/401 errors from deletePlaylist. Now only 404 (playlist already gone) is suppressed; quota/auth errors propagate correctly.",
+      "phase": "04"
+    }
+  ],
+  "uncommitted_files": [
+    "app/src/main/java/com/musicali/app/auth/AuthRepositoryImpl.kt",
+    "app/src/main/java/com/musicali/app/data/remote/youtube/YouTubeRepositoryImpl.kt",
+    ".planning/REQUIREMENTS.md"
+  ],
+  "next_action": "Commit debug fixes: `git add app/src/main/java/com/musicali/app/auth/AuthRepositoryImpl.kt app/src/main/java/com/musicali/app/data/remote/youtube/YouTubeRepositoryImpl.kt && git add -f .planning/REQUIREMENTS.md && git commit -m 'fix(04): use Dispatchers.Main for AppAuth token refresh, propagate 401/403 from deletePlaylist'`. Then wait for YouTube quota reset (midnight Pacific) and re-test.",
+  "context_notes": "Phase 4 UI is functionally complete. All 4 UI states (Idle, Generating, Success, Error) render correctly with correct messages and action buttons. The only issue was the auth/Looper bug causing 'No internet connection' when token expired mid-pipeline. Fix is ready but uncommitted. After quota reset and re-test, approve checkpoint -> phase verifier -> Phase 5 (polish/cache)."
+}

@@ -45,14 +45,21 @@ class YouTubeRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Deletes the playlist. Ignores 404 (already deleted).
+     * Deletes the playlist. Ignores 404 (already deleted) but lets other errors propagate.
      * Per D-09: delete + recreate strategy — item-level deletes forbidden (7,500 units).
+     *
+     * Only 404 is swallowed — quota (403) and auth (401) errors are re-thrown so the caller
+     * (GeneratePlaylistUseCase) can surface the correct error message instead of proceeding
+     * with playlist creation that will also fail.
      */
     override suspend fun deletePlaylist(playlistId: String) {
-        runCatching {
+        try {
             apiService.deletePlaylist(id = playlistId)
+        } catch (e: retrofit2.HttpException) {
+            if (e.code() == 404) return  // Playlist already gone — safe to ignore
+            throw e  // 401, 403, 5xx etc. must propagate to the use case
         }
-        // Silently ignore errors (playlist may not exist on first run)
+        // Non-HTTP exceptions (IOException, etc.) propagate naturally
     }
 
     /**

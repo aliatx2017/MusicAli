@@ -89,7 +89,7 @@ class AuthRepositoryImpl @Inject constructor(
      * built from the refresh token. We build this manually since AuthState is not persisted here
      * (we store tokens in ESP directly).
      */
-    private suspend fun refreshAccessToken(): String = withContext(Dispatchers.IO) {
+    private suspend fun refreshAccessToken(): String {
         val refreshToken = tokenStore.getRefreshToken()
             ?: throw IllegalStateException("No refresh token — user must sign in")
 
@@ -102,29 +102,33 @@ class AuthRepositoryImpl @Inject constructor(
             .setRefreshToken(refreshToken)
             .build()
 
-        // Create a temporary AuthorizationService for the refresh call.
-        // This avoids holding a long-lived AuthorizationService outside of Activity lifecycle.
-        val tempService = AuthorizationService(context)
-        return@withContext try {
-            suspendCancellableCoroutine { cont ->
-                tempService.performTokenRequest(tokenRequest) { tokenResponse, exception ->
-                    when {
-                        tokenResponse != null -> {
-                            val newAccessToken = tokenResponse.accessToken
-                                ?: run { cont.resumeWithException(IllegalStateException("Token response missing access_token")); return@performTokenRequest }
-                            val newRefreshToken = tokenResponse.refreshToken ?: refreshToken
-                            val newExpiryMs = tokenResponse.accessTokenExpirationTime
-                                ?: (System.currentTimeMillis() + 3600_000L)
-                            tokenStore.saveTokens(newAccessToken, newRefreshToken, newExpiryMs)
-                            cont.resume(newAccessToken)
+        // MUST run on main thread: AuthorizationService.performTokenRequest() creates a Handler
+        // internally to deliver its callback. Handler() requires a Looper — creating it on an
+        // OkHttp background thread (which has no Looper) throws RuntimeException, which OkHttp
+        // wraps as IOException, producing a false "No internet connection" error in the UI.
+        return withContext(Dispatchers.Main) {
+            val tempService = AuthorizationService(context)
+            try {
+                suspendCancellableCoroutine { cont ->
+                    tempService.performTokenRequest(tokenRequest) { tokenResponse, exception ->
+                        when {
+                            tokenResponse != null -> {
+                                val newAccessToken = tokenResponse.accessToken
+                                    ?: run { cont.resumeWithException(IllegalStateException("Token response missing access_token")); return@performTokenRequest }
+                                val newRefreshToken = tokenResponse.refreshToken ?: refreshToken
+                                val newExpiryMs = tokenResponse.accessTokenExpirationTime
+                                    ?: (System.currentTimeMillis() + 3600_000L)
+                                tokenStore.saveTokens(newAccessToken, newRefreshToken, newExpiryMs)
+                                cont.resume(newAccessToken)
+                            }
+                            exception != null -> cont.resumeWithException(exception)
+                            else -> cont.resumeWithException(IllegalStateException("Token refresh failed with no error"))
                         }
-                        exception != null -> cont.resumeWithException(exception)
-                        else -> cont.resumeWithException(IllegalStateException("Token refresh failed with no error"))
                     }
                 }
+            } finally {
+                tempService.dispose()  // per Pitfall 3 — prevent ServiceConnection leak
             }
-        } finally {
-            tempService.dispose()  // per Pitfall 3 — prevent ServiceConnection leak
         }
     }
 

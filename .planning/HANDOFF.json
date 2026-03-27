@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-27T00:20:02.572Z",
+  "timestamp": "2026-03-27T13:43:12.129Z",
   "phase": "04",
   "phase_name": "orchestration-and-progress-ui",
   "phase_dir": ".planning/phases/04-orchestration-and-progress-ui",
@@ -11,28 +11,29 @@
   "completed_tasks": [
     {"id": 1, "name": "Extract PlaylistGenerator interface, expand PlaylistViewModel, add PlaylistViewModelTest", "status": "done", "commit": "c621023"},
     {"id": 2, "name": "Create PlaylistScreen composable and wire into MainActivity", "status": "done", "commit": "9e78d4f"},
-    {"id": 3, "name": "Verify end-to-end playlist generation on device", "status": "in_progress", "progress": "Tested on Pixel 8a - 16. UI states work correctly. AliMusings playlist created (empty) on YouTube Music. Two bugs found: (1) 'No internet connection' misclassification — FIXED (uncommitted), (2) YouTube quota exhausted — external blocker."}
+    {"id": 3, "name": "Fix AuthRepositoryImpl (Looper) + YouTubeRepositoryImpl (deletePlaylist 401/403)", "status": "done", "commit": "96f2c74"},
+    {"id": 4, "name": "Install fixed build on device and verify Looper fix works", "status": "done", "progress": "Installed via ./gradlew :app:installDebug. Generation ran to completion — no more 'No internet' misclassification. Looper fix confirmed. Hit quota at playlist insertion step (6,650/10,000 units used today, 2026-03-27)."}
   ],
   "remaining_tasks": [
-    {"id": "debug-fix", "name": "Commit debug fixes for no-internet-misclassification", "status": "not_started"},
-    {"id": "checkpoint-approve", "name": "Re-test after quota reset and approve Phase 4 checkpoint", "status": "blocked_on_quota_reset"}
+    {"id": "quota-reset", "name": "Wait for YouTube quota reset, run one clean generation", "status": "blocked_on_quota_reset"},
+    {"id": "checkpoint-approve", "name": "Verify AliMusings populated with songs, then approve Phase 4 checkpoint", "status": "not_started"}
   ],
   "blockers": [
     {
-      "description": "YouTube Data API daily quota exhausted during UAT (two generation runs burned ~9,850+ units each)",
+      "description": "YouTube Data API daily quota exhausted. As of 2026-03-27 ~08:40 CT, 6,650/10,000 units used. Not enough headroom for another full run (~9,850 units needed).",
       "type": "external",
-      "workaround": "Wait for quota reset (midnight Pacific). Check https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas"
+      "workaround": "Wait for quota reset (midnight Pacific). Check https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas — look for usage to drop back to ~0."
     }
   ],
   "human_actions_pending": [
     {
-      "action": "Commit the three debug-fixed files, then after quota resets run ./gradlew :app:installDebug and tap Generate Playlist",
-      "context": "Files modified but uncommitted: AuthRepositoryImpl.kt (Dispatchers.Main fix for AppAuth Looper crash), YouTubeRepositoryImpl.kt (deletePlaylist now propagates 401/403), REQUIREMENTS.md. Debug session: .planning/debug/no-internet-misclassification.md",
+      "action": "After quota resets: launch app (fixed build already installed), tap Generate Playlist, verify AliMusings is populated with songs",
+      "context": "Fixed build installed (commit 96f2c74). Both bugs confirmed fixed. Generation runs fully through YouTube search phase — only blocked on quota. No code changes needed. An empty 'AliMusings' playlist may exist from previous partial run — next successful run will replace it.",
       "blocking": true
     },
     {
-      "action": "After successful generation (AliMusings populated with songs), type 'confirmed fixed' to close debug session and Phase 4 checkpoint",
-      "context": "Phase 4 completes after checkpoint approval -> phase verifier runs -> ROADMAP advances to Phase 5",
+      "action": "After successful generation, type 'confirmed fixed' to close Phase 4 checkpoint",
+      "context": "Phase 4 completes after checkpoint approval -> gsd:verify-work -> ROADMAP advances to Phase 5 (polish/cache)",
       "blocking": true
     }
   ],
@@ -48,11 +49,7 @@
       "phase": "04"
     }
   ],
-  "uncommitted_files": [
-    "app/src/main/java/com/musicali/app/auth/AuthRepositoryImpl.kt",
-    "app/src/main/java/com/musicali/app/data/remote/youtube/YouTubeRepositoryImpl.kt",
-    ".planning/REQUIREMENTS.md"
-  ],
-  "next_action": "Commit debug fixes: `git add app/src/main/java/com/musicali/app/auth/AuthRepositoryImpl.kt app/src/main/java/com/musicali/app/data/remote/youtube/YouTubeRepositoryImpl.kt && git add -f .planning/REQUIREMENTS.md && git commit -m 'fix(04): use Dispatchers.Main for AppAuth token refresh, propagate 401/403 from deletePlaylist'`. Then wait for YouTube quota reset (midnight Pacific) and re-test.",
-  "context_notes": "Phase 4 UI is functionally complete. All 4 UI states (Idle, Generating, Success, Error) render correctly with correct messages and action buttons. The only issue was the auth/Looper bug causing 'No internet connection' when token expired mid-pipeline. Fix is ready but uncommitted. After quota reset and re-test, approve checkpoint -> phase verifier -> Phase 5 (polish/cache)."
+  "uncommitted_files": [],
+  "next_action": "Check quota at https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas — when usage shows ~0, launch app (already installed), tap Generate Playlist, and wait for success. Then type 'confirmed fixed'.",
+  "context_notes": "Phase 4 is functionally complete. Both bugs found during UAT are fixed and committed (96f2c74). Fixed build is installed on device and confirmed working — generation runs all the way through YouTube search (6,500 units), then hits quota at the playlist-insert phase. An empty 'AliMusings' playlist may exist from a previous partial run. No code changes needed. Pure quota wait."
 }

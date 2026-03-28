@@ -1,5 +1,6 @@
 package com.musicali.app.auth
 
+import android.util.Log
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -23,7 +24,12 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = runBlocking {
             mutex.withLock {
-                authRepository.getValidToken()
+                try {
+                    authRepository.getValidToken()
+                } catch (e: Exception) {
+                    Log.e("AuthInterceptor", "getValidToken() threw ${e::class.simpleName}: ${e.message}", e)
+                    throw e
+                }
             }
         }
         val request = chain.request().newBuilder()

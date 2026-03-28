@@ -2,6 +2,7 @@ package com.musicali.app.auth
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.musicali.app.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -107,10 +108,12 @@ class AuthRepositoryImpl @Inject constructor(
         // OkHttp background thread (which has no Looper) throws RuntimeException, which OkHttp
         // wraps as IOException, producing a false "No internet connection" error in the UI.
         return withContext(Dispatchers.Main) {
+            Log.d("AuthRepo", "refreshAccessToken: on thread=${Thread.currentThread().name}")
             val tempService = AuthorizationService(context)
             try {
                 suspendCancellableCoroutine { cont ->
                     tempService.performTokenRequest(tokenRequest) { tokenResponse, exception ->
+                        Log.d("AuthRepo", "performTokenRequest callback: hasResponse=${tokenResponse != null} exception=${exception?.message}")
                         when {
                             tokenResponse != null -> {
                                 val newAccessToken = tokenResponse.accessToken

@@ -14,7 +14,7 @@ class ArtistSelectionUseCase @Inject constructor(
     private val artistHistoryRepository: ArtistHistoryRepository
 ) {
     companion object {
-        const val TARGET_ARTIST_COUNT = 3  // DEBUG: reduced for quota testing (restore to 65)
+        const val TARGET_ARTIST_COUNT = 65
     }
 
     suspend fun selectArtists(): List<String> {

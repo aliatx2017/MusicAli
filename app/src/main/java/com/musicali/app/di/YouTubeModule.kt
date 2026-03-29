@@ -28,6 +28,7 @@ abstract class YouTubeModule {
         private val json = Json {
             ignoreUnknownKeys = true    // YouTube API may add fields in new API versions
             coerceInputValues = true    // safe default for optional/nullable fields
+            encodeDefaults = true       // serialize fields with default values (e.g. kind = "youtube#video")
         }
 
         @Provides

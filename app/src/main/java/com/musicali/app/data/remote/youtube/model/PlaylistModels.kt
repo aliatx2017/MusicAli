@@ -30,6 +30,7 @@ data class PlaylistResponse(
 // playlistItems.insert request
 @Serializable
 data class AddPlaylistItemRequest(
+    val kind: String = "youtube#playlistItem",
     val snippet: PlaylistItemSnippet
 )
 

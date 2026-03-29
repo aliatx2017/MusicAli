@@ -122,7 +122,15 @@ None currently.
 
 ---
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260329-d9o | Fix auth failure misclassified as No internet connection | 2026-03-29 | 50ebbb3 | [260329-d9o-fix-auth-failure-misclassified-as-no-int](./quick/260329-d9o-fix-auth-failure-misclassified-as-no-int/) |
+
+---
+
 ## Session Continuity
 
-**Last session:** 
-**Stopped at:** Awaiting YouTube quota reset for Phase 4 re-test and checkpoint approval
+**Last session:** 2026-03-29
+**Stopped at:** Fixed auth error classification (AuthFailureException). Need rebuild + reinstall, then re-run 3-artist test to confirm end-to-end pipeline.

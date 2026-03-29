@@ -1,5 +1,6 @@
 package com.musicali.app.domain.usecase
 
+import com.musicali.app.auth.AuthFailureException
 import com.musicali.app.auth.TokenStore
 import com.musicali.app.data.remote.youtube.YouTubeRepository
 import com.musicali.app.domain.repository.ArtistHistoryRepository
@@ -87,6 +88,9 @@ class GeneratePlaylistUseCase @Inject constructor(
         } catch (e: HttpException) {
             send(GenerationProgress.Failed(httpErrorToGenerationError(e)))
             return@channelFlow
+        } catch (e: AuthFailureException) {
+            send(GenerationProgress.Failed(GenerationError.AuthExpired))
+            return@channelFlow
         } catch (e: IOException) {
             send(GenerationProgress.Failed(GenerationError.NetworkError))
             return@channelFlow
@@ -120,6 +124,8 @@ class GeneratePlaylistUseCase @Inject constructor(
             send(GenerationProgress.Success(songsAdded = found.size, artistsSkipped = skipped))
         } catch (e: HttpException) {
             send(GenerationProgress.Failed(httpErrorToGenerationError(e)))
+        } catch (e: AuthFailureException) {
+            send(GenerationProgress.Failed(GenerationError.AuthExpired))
         } catch (e: IOException) {
             send(GenerationProgress.Failed(GenerationError.NetworkError))
         }

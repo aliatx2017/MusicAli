@@ -28,7 +28,7 @@ class AuthInterceptor @Inject constructor(
                     authRepository.getValidToken()
                 } catch (e: Exception) {
                     Log.e("AuthInterceptor", "getValidToken() threw ${e::class.simpleName}: ${e.message}", e)
-                    throw e
+                    throw AuthFailureException("Auth failed: ${e.message}", e)
                 }
             }
         }

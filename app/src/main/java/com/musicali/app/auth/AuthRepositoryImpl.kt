@@ -92,7 +92,10 @@ class AuthRepositoryImpl @Inject constructor(
      */
     private suspend fun refreshAccessToken(): String {
         val refreshToken = tokenStore.getRefreshToken()
-            ?: throw IllegalStateException("No refresh token — user must sign in")
+            ?: run {
+                Log.e("AuthRepo", "refreshAccessToken: NO REFRESH TOKEN stored — user must sign in")
+                throw IllegalStateException("No refresh token — user must sign in")
+            }
 
         // Build a refresh token grant request using AppAuth
         val tokenRequest = TokenRequest.Builder(
@@ -103,6 +106,7 @@ class AuthRepositoryImpl @Inject constructor(
             .setRefreshToken(refreshToken)
             .build()
 
+        Log.d("AuthRepo", "refreshAccessToken: switching to Main thread")
         // MUST run on main thread: AuthorizationService.performTokenRequest() creates a Handler
         // internally to deliver its callback. Handler() requires a Looper — creating it on an
         // OkHttp background thread (which has no Looper) throws RuntimeException, which OkHttp

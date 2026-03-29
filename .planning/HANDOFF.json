@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-28T15:43:01.216Z",
+  "timestamp": "2026-03-29T15:57:30.250Z",
   "phase": "04",
   "phase_name": "orchestration-and-progress-ui",
   "phase_dir": ".planning/phases/04-orchestration-and-progress-ui",
@@ -11,56 +11,37 @@
   "completed_tasks": [
     {"id": 1, "name": "Extract PlaylistGenerator interface, expand PlaylistViewModel, add PlaylistViewModelTest", "status": "done", "commit": "c621023"},
     {"id": 2, "name": "Create PlaylistScreen composable and wire into MainActivity", "status": "done", "commit": "9e78d4f"},
-    {"id": 3, "name": "Fix AuthRepositoryImpl (Looper) + YouTubeRepositoryImpl (deletePlaylist 401/403)", "status": "done", "commit": "96f2c74"},
-    {"id": 4, "name": "Install fixed build on device and verify Looper fix works", "status": "done", "progress": "Installed via ./gradlew :app:installDebug. Generation ran to completion — no more 'No internet' misclassification. Looper fix confirmed. Hit quota at playlist insertion step."},
-    {"id": 5, "name": "Reduce TARGET_ARTIST_COUNT to 3 for quota-friendly testing", "status": "done", "progress": "Uncommitted: ArtistSelectionUseCase.TARGET_ARTIST_COUNT set to 3 (was 65). Debug logging added to AuthInterceptor and AuthRepositoryImpl. Needs commit or revert before final UAT."}
+    {"id": 3, "name": "Fix auth pipeline bugs (Looper, deletePlaylist, AuthFailureException)", "status": "done", "commit": "50ebbb3"},
+    {"id": 4, "name": "Fix encodeDefaults + scraping client separation + UAT 3-artist run", "status": "done", "commit": "9f86bb1",
+     "progress": "3-artist test passed. Playlist created + 3 tracks added to AliMusings. Root cause of 'No Internet connection': encodeDefaults=true missing from Json config — ResourceId.kind='youtube#video' was silently dropped from request body, causing YouTube API 400 invalidResourceType."}
   ],
-  "remaining_tasks": [
-    {"id": "quota-reset", "name": "Wait for YouTube quota reset, run one clean generation (with 3 artists or restore to 65)", "status": "blocked_on_quota_reset"},
-    {"id": "restore-count", "name": "Restore TARGET_ARTIST_COUNT to 65 (or chosen final value) before shipping", "status": "not_started"},
-    {"id": "checkpoint-approve", "name": "Verify AliMusings populated with songs, then approve Phase 4 checkpoint", "status": "not_started"}
-  ],
-  "blockers": [
-    {
-      "description": "YouTube Data API daily quota exhausted. As of 2026-03-27 ~08:40 CT, 6,650/10,000 units used. Not enough headroom for a full 65-artist run (~6,500 units). With 3 artists the cost is ~300 units — should succeed after reset.",
-      "type": "external",
-      "workaround": "Wait for quota reset (midnight Pacific). Check https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas — look for usage to drop back to ~0. Then run with 3 artists to confirm end-to-end, then restore to 65."
-    }
-  ],
+  "remaining_tasks": [],
+  "blockers": [],
   "human_actions_pending": [
     {
-      "action": "After quota resets: commit debug changes (for 3-artist test run) or revert them, rebuild app, tap Generate Playlist, verify AliMusings is populated",
-      "context": "Uncommitted changes include TARGET_ARTIST_COUNT=3 (debug) and extra Log statements in AuthInterceptor + AuthRepositoryImpl. Decide: commit for cheap 3-artist test, or revert to 65 for full run. Either way rebuild and reinstall.",
-      "blocking": true
-    },
-    {
-      "action": "After successful generation, restore TARGET_ARTIST_COUNT to 65 and remove debug Log statements, then type 'confirmed fixed' to close Phase 4 checkpoint",
-      "context": "Phase 4 completes after checkpoint approval -> gsd:verify-work -> ROADMAP advances to Phase 5 (polish/cache)",
-      "blocking": true
+      "action": "Run /gsd:verify-work 04 to formally close Phase 4, then /gsd:plan-phase 5",
+      "context": "Phase 4 is functionally complete. All code is clean and committed. Verification is optional but recommended before Phase 5.",
+      "blocking": false
     }
   ],
   "decisions": [
     {
-      "decision": "Fix AuthRepositoryImpl.refreshAccessToken() with withContext(Dispatchers.Main) for AppAuth performTokenRequest",
-      "rationale": "AppAuth creates an Android Handler internally requiring a Looper. OkHttp interceptor threads have no Looper, causing RuntimeException wrapped as IOException, misclassified as NetworkError ('No internet connection').",
+      "decision": "encodeDefaults=true in YouTubeModule Json config",
+      "rationale": "kotlinx.serialization omits fields at their default value — ResourceId.kind='youtube#video' was never sent in the addPlaylistItem request body, causing YouTube API 400 invalidResourceType masked as 'No Internet connection'.",
       "phase": "04"
     },
     {
-      "decision": "Fix YouTubeRepositoryImpl.deletePlaylist() to only swallow 404, not all exceptions via runCatching",
-      "rationale": "Original runCatching silently hid 403/401 errors from deletePlaylist. Now only 404 (playlist already gone) is suppressed; quota/auth errors propagate correctly.",
+      "decision": "Separate scraping OkHttpClient (@Named('scraping')) from YouTube API client",
+      "rationale": "AuthInterceptor must not run on unauthenticated EveryNoise scraping requests.",
       "phase": "04"
     },
     {
-      "decision": "Temporarily reduce TARGET_ARTIST_COUNT from 65 to 3 for quota-friendly testing",
-      "rationale": "User requested this to overcome YouTube API quota limits during testing. 3 artists = ~300 quota units vs 6,500 for 65. Must be restored to 65 before final release.",
+      "decision": "Add kind='youtube#playlistItem' to AddPlaylistItemRequest",
+      "rationale": "Required by YouTube Data API resource contract for playlistItems.insert.",
       "phase": "04"
     }
   ],
-  "uncommitted_files": [
-    "app/src/main/java/com/musicali/app/auth/AuthInterceptor.kt (debug Log added)",
-    "app/src/main/java/com/musicali/app/auth/AuthRepositoryImpl.kt (debug Log added)",
-    "app/src/main/java/com/musicali/app/domain/usecase/ArtistSelectionUseCase.kt (TARGET_ARTIST_COUNT=3, was 65)"
-  ],
-  "next_action": "Decide whether to commit debug changes (for 3-artist test run) or revert them (for full 65-artist run). Then after quota resets, rebuild app, run generation, verify AliMusings playlist is populated. Then restore TARGET_ARTIST_COUNT=65 and remove debug logs.",
-  "context_notes": "Phase 4 is functionally complete. Both core bugs fixed (Looper + deletePlaylist). An additional debug session happened where TARGET_ARTIST_COUNT was reduced to 3 and extra logging added to aid diagnosis. These changes are uncommitted. The decision is whether to do a quick 3-artist test first (cheaper on quota) or go straight to full 65-artist run once quota resets."
+  "uncommitted_files": [],
+  "next_action": "Run /gsd:verify-work 04 to close Phase 4 formally, then /gsd:plan-phase 5 for Resilience and Quota Management.",
+  "context_notes": "Phase 4 is complete. All code committed clean in 9f86bb1. End-to-end pipeline works: scrape EveryNoise -> select 65 artists -> search YouTube -> build AliMusings playlist. Known issue: scraper occasionally returns genre-tag strings as artist names ('new rave', 'experimental indie rock') instead of actual artist names — Phase 2/5 scraping quality issue."
 }

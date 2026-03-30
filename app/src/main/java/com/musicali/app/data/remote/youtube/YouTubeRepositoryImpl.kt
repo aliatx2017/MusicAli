@@ -1,6 +1,8 @@
 package com.musicali.app.data.remote.youtube
 
 import com.musicali.app.auth.TokenStore
+import com.musicali.app.data.local.VideoIdCacheDao
+import com.musicali.app.data.local.VideoIdCacheEntity
 import com.musicali.app.data.remote.youtube.model.AddPlaylistItemRequest
 import com.musicali.app.data.remote.youtube.model.CreatePlaylistRequest
 import com.musicali.app.data.remote.youtube.model.PlaylistItemSnippet
@@ -13,7 +15,8 @@ import javax.inject.Singleton
 @Singleton
 class YouTubeRepositoryImpl @Inject constructor(
     private val apiService: YouTubeApiService,
-    private val tokenStore: TokenStore
+    private val tokenStore: TokenStore,
+    private val videoIdCacheDao: VideoIdCacheDao
 ) : YouTubeRepository {
 
     /**
@@ -21,12 +24,37 @@ class YouTubeRepositoryImpl @Inject constructor(
      * type=video + videoCategoryId=10 (Music) = 100 quota units per call.
      * Two-call Topic channel strategy (D-06) was revised: costs 200 units/artist × 65 = 13,000
      * which exceeds the 10,000 daily free quota. Single-call = 6,500 units, within budget.
+     *
+     * YT-02: Cache-first strategy. On cache hit (including null = known no-result), returns
+     * immediately without calling the YouTube API. On cache miss, calls the API and writes
+     * the result (including null) to the cache for future runs.
      */
     override suspend fun searchTopSong(artistName: String): String? {
+        val normalizedName = artistName.trim().lowercase()
+
+        // Cache hit: return immediately without calling the API
+        val cached = videoIdCacheDao.getByArtistName(normalizedName)
+        if (cached != null) {
+            return cached.videoId  // may be null (cached no-result)
+        }
+
+        // Cache miss: call the YouTube API
         val response = runCatching {
             apiService.searchVideos(query = artistName)
         }.getOrNull() ?: return null
-        return response.items.firstOrNull()?.id?.videoId?.takeIf { it.isNotBlank() }
+
+        val videoId = response.items.firstOrNull()?.id?.videoId?.takeIf { it.isNotBlank() }
+
+        // Write result to cache (including null = no result found for this artist)
+        videoIdCacheDao.upsert(
+            VideoIdCacheEntity(
+                normalizedArtistName = normalizedName,
+                videoId = videoId,
+                cachedAt = System.currentTimeMillis()
+            )
+        )
+
+        return videoId
     }
 
     /**

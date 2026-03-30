@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.musicali.app.data.local.AppDatabase
 import com.musicali.app.data.local.ArtistDao
 import com.musicali.app.data.local.GenreCacheDao
+import com.musicali.app.data.local.VideoIdCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "musicali.db")
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
             .build()
 
     @Provides
@@ -28,4 +29,7 @@ object DatabaseModule {
 
     @Provides
     fun provideGenreCacheDao(db: AppDatabase): GenreCacheDao = db.genreCacheDao()
+
+    @Provides
+    fun provideVideoIdCacheDao(db: AppDatabase): VideoIdCacheDao = db.videoIdCacheDao()
 }

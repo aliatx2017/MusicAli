@@ -27,8 +27,12 @@ class FakeYouTubeRepository : YouTubeRepository {
     /** If set, addTrack() throws this exception. */
     var addTrackException: Exception? = null
 
+    /** Tracks how many times searchTopSong() was called per artist name. */
+    val searchCallCounts = mutableMapOf<String, Int>()
+
     override suspend fun searchTopSong(artistName: String): String? {
         searchException?.let { throw it }
+        searchCallCounts[artistName] = (searchCallCounts[artistName] ?: 0) + 1
         return searchResults[artistName]
     }
 

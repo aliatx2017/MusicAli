@@ -1,5 +1,6 @@
 package com.musicali.app.domain.usecase
 
+import android.util.Log
 import com.musicali.app.auth.AuthFailureException
 import com.musicali.app.auth.TokenStore
 import com.musicali.app.data.remote.youtube.YouTubeRepository
@@ -94,6 +95,12 @@ class GeneratePlaylistUseCase @Inject constructor(
         } catch (e: IOException) {
             send(GenerationProgress.Failed(GenerationError.NetworkError))
             return@channelFlow
+        }
+
+        // YT-03: Log each artist skipped due to no YouTube result (one log per artist)
+        val skippedArtists = searchResults.filter { it.second == null }.map { it.first }
+        for (artistName in skippedArtists) {
+            Log.w("GeneratePlaylist", "Skipped artist (no YouTube result): $artistName")
         }
 
         // Stage 4: Build playlist

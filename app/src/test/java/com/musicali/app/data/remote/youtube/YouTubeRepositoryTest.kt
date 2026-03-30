@@ -6,6 +6,7 @@ import com.musicali.app.data.remote.youtube.model.AddPlaylistItemRequest
 import com.musicali.app.data.remote.youtube.model.CreatePlaylistRequest
 import com.musicali.app.data.remote.youtube.model.PlaylistItemResponse
 import com.musicali.app.data.remote.youtube.model.PlaylistResponse
+import com.musicali.app.data.remote.youtube.model.PlaylistSnippet
 import com.musicali.app.data.remote.youtube.model.SearchItem
 import com.musicali.app.data.remote.youtube.model.SearchItemId
 import com.musicali.app.data.remote.youtube.model.SearchResponse
@@ -137,7 +138,7 @@ private class FakeYouTubeApiService(
         part: String,
         apiKey: String,
         body: CreatePlaylistRequest
-    ): PlaylistResponse = PlaylistResponse(id = "test-playlist-id")
+    ): PlaylistResponse = PlaylistResponse(id = "test-playlist-id", snippet = PlaylistSnippet(title = "AliMusings"))
 
     override suspend fun deletePlaylist(id: String, apiKey: String): Unit = Unit
 

@@ -13,7 +13,7 @@
 - [ ] **Phase 2: Scraping and Selection** - EveryNoise scraping for 3 genres, artist cache fallback, weighted proportional selection, and cross-run deduplication
 - [x] **Phase 3: Auth and YouTube Integration** - Google OAuth PKCE flow, token persistence and proactive refresh, YouTube search and playlist create/replace (completed 2026-03-26)
 - [x] **Phase 4: Orchestration and Progress UI** - Full pipeline wired end-to-end via GeneratePlaylistUseCase, single-screen Compose UI with real-time progress (completed 2026-03-26)
-- [ ] **Phase 5: Resilience and Quota Management** - Video ID caching to eliminate repeat quota spend, graceful skip for artists with no search result
+- [x] **Phase 5: Resilience and Quota Management** - Video ID caching to eliminate repeat quota spend, graceful skip for artists with no search result (completed 2026-03-30)
 
 ---
 
@@ -103,7 +103,7 @@ Plans:
 | 2. Scraping and Selection | 3/3 | Complete   | 2026-03-26 |
 | 3. Auth and YouTube Integration | 4/4 | Complete   | 2026-03-26 |
 | 4. Orchestration and Progress UI | 2/2 | Complete   | 2026-03-26 |
-| 5. Resilience and Quota Management | 0/? | Not started | - |
+| 5. Resilience and Quota Management | 1/1 | Complete   | 2026-03-30 |
 
 ---
 

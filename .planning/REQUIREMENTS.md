@@ -28,8 +28,8 @@
 ### YouTube Integration
 
 - [x] **YT-01**: App searches YouTube Data API v3 for a top song for each selected artist
-- [ ] **YT-02**: App caches artist → videoId mappings in Room DB to avoid repeat quota spend
-- [ ] **YT-03**: App skips artists where no YouTube result is found and continues generation
+- [x] **YT-02**: App caches artist → videoId mappings in Room DB to avoid repeat quota spend
+- [x] **YT-03**: App skips artists where no YouTube result is found and continues generation
 - [x] **YT-04**: App creates or replaces the "AliMusings" YouTube Music playlist (delete + recreate, not item-level delete)
 - [x] **YT-05**: App adds all found tracks to the AliMusings playlist in a single session
 
@@ -84,8 +84,8 @@
 | UX-01 | Phase 4 | Complete |
 | UX-02 | Phase 4 | Complete |
 | UX-03 | Phase 4 | Complete |
-| YT-02 | Phase 5 | Pending |
-| YT-03 | Phase 5 | Pending |
+| YT-02 | Phase 5 | Complete |
+| YT-03 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 19 total
